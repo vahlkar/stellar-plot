@@ -116,7 +116,26 @@ def main(argv=sys.argv):
     tr = tr_b.call()
 
     df = trades_to_dataframe(tr)
-    plot_trades(df)
+    counter_balance = 100
+    base_balance = 0
+    print("Balances: {} base; {} counter".format(base_balance, counter_balance))
+    for i in df.index:
+        bollinger_high = df["sma"][i] + 2*df["std"][i]
+        bollinger_low = df["sma"][i] - 2*df["std"][i]
+        close = df["close"][i]
+        dt = df["datetime"][i]
+        if close >= bollinger_high:
+            print("SELL on {} at {}".format(dt, close))
+            counter_balance += base_balance * close
+            base_balance = 0
+        elif close <= bollinger_low:
+            print("BUY on {} at {}".format(dt, close))
+            base_balance += counter_balance / close
+            counter_balance = 0
+
+    print("Balances: {} base; {} counter".format(base_balance, counter_balance))
+
+    # plot_trades(df)
 
 if __name__ == "__main__":
     main()
