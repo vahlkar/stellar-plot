@@ -114,11 +114,17 @@ def plot_trades(df):
 def main(argv=sys.argv):
     server = Server(horizon_url=SRV)
 
-    tr_b = server.trade_aggregations(assets[BASE], assets[COUNTER], 86400000, round(datetime.timestamp(datetime(2021,3,1))*1000))
+    tr_b = server.trade_aggregations(assets[BASE], assets[COUNTER], 86400000, round(datetime.timestamp(datetime(2021,3,26)))*1000, offset=22*60*60*1000)
+    # tr_b = server.trade_aggregations(assets[BASE], assets[COUNTER], 3600000, round(datetime.timestamp(datetime(2021,8,20)))*1000)
     tr_b.limit(200)
     tr = tr_b.call()
 
     df = trades_to_dataframe(tr)
+
+    plot_trades(df)
+    # test_strategy(df)
+
+def test_strategy(df):
     counter_balance = 100
     base_balance = 0
     print("Balances: {} base; {} counter".format(base_balance, counter_balance))
@@ -135,10 +141,7 @@ def main(argv=sys.argv):
             print("BUY on {} at {}".format(dt, close))
             base_balance += counter_balance / close
             counter_balance = 0
-
     print("Balances: {} base; {} counter".format(base_balance, counter_balance))
-
-    # plot_trades(df)
 
 if __name__ == "__main__":
     main()
